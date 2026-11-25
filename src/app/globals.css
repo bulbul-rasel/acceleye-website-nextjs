@@ -1,26 +1,187 @@
 @import "tailwindcss";
+/* `join` is excluded: its @scope rules crash Turbopack's CSS parser in `next dev`
+   ("Invalid empty selector"). We don't use .join anywhere. */
+@plugin "daisyui" {
+  exclude: join;
+}
+@plugin "daisyui/theme" {
+  name: "acceleye";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: #050a16;
+  --color-base-200: #0a1226;
+  --color-base-300: #1a2a50;
+  --color-base-content: #e8eefc;
+  --color-primary: #2dd4ff;
+  --color-primary-content: #030712;
+  --color-secondary: #ff6b3d;
+  --color-secondary-content: #ffffff;
+  --color-accent: #2dd4ff;
+  --color-accent-content: #030712;
+  --color-neutral: #101b36;
+  --color-neutral-content: #e8eefc;
+  --color-info: #2dd4ff;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #ff6b3d;
+  --radius-selector: 9999px;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050a16;
+  --foreground: #e8eefc;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-navy-950: #030712;
+  --color-navy-900: #0a1226;
+  --color-navy-800: #101b36;
+  --color-navy-700: #1a2a50;
+  --color-accent: #2dd4ff;
+  --color-accent-strong: #00b8e6;
+  --color-alert: #ff6b3d;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  color-scheme: dark;
+  /* Everything sized in rem scales up ~6% for easier reading */
+  font-size: 106.25%;
+}
+
+/* Gradient text for highlighted words */
+.text-gradient {
+  background: linear-gradient(90deg, #2dd4ff 0%, #8be9ff 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Soft float for hero illustrations */
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
   }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.animate-float {
+  animation: float-y 6s ease-in-out infinite;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Subtle grid used behind hero / CTA sections */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+}
+
+.animate-scan {
+  animation: scan 4s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scan,
+  .animate-pulse-ring,
+  .animate-float {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Markdown post body (news and blog) */
+.post-body { font-size: 1.25rem; line-height: 1.75; color: rgb(255 255 255 / 0.85); }
+.post-body > * + * { margin-top: 1.25rem; }
+.post-body h2 { margin-top: 3rem; font-size: 2rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; }
+.post-body h3 { margin-top: 2rem; font-size: 1.5rem; font-weight: 700; color: #fff; }
+.post-body a { color: var(--color-accent, #2dd4ff); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.post-body ul { list-style: disc; padding-left: 1.5rem; } .post-body ol { list-style: decimal; padding-left: 1.5rem; }
+.post-body li + li { margin-top: 0.5rem; }
+.post-body blockquote { border-left: 3px solid #2dd4ff; padding-left: 1.25rem; color: rgb(255 255 255 / 0.7); font-style: italic; }
+.post-body img { border-radius: 1.5rem; width: 100%; height: auto; }
+.post-body table { width: 100%; border-collapse: collapse; font-size: 1.05rem; display: block; overflow-x: auto; }
+.post-body th, .post-body td { border: 1px solid rgb(255 255 255 / 0.12); padding: 0.9rem 1rem; text-align: left; vertical-align: top; }
+.post-body th { background: rgb(255 255 255 / 0.05); color: #fff; }
+.post-body strong { color: #fff; }
+
+/* Section-by-section scrolling */
+html {
+  scroll-snap-type: y proximity;
+  scroll-padding-top: 76px;
+}
+main section {
+  scroll-snap-align: start;
+}
+@keyframes section-reveal {
+  from { opacity: 0; transform: translateY(140px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes section-leave {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0.4; transform: translateY(-70px) scale(0.97); }
+}
+/* Scroll-driven, CSS only (nothing for React to mismatch): every section rises into place as it
+   enters, then drifts up and softens as the next one takes over. Unsupported browsers show sections normally. */
+@supports (animation-timeline: view()) {
+  main section {
+    animation: section-reveal linear both, section-leave linear both;
+    animation-timeline: view(), view();
+    animation-range: entry 0% entry 45%, exit 50% exit 100%;
+    transform-origin: 50% 100%;
+  }
+}
+@keyframes cv-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@keyframes cv-shine { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-snap-type: none; }
+  main section { animation: none !important; }
 }
